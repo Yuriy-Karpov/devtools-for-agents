@@ -1,6 +1,6 @@
 {
   "name": "chrome-devtools",
-  "version": "1.0.0+codex.20260724204146",
+  "version": "1.0.0+codex.20260724211525",
   "description": "Pinned Chrome DevTools MCP for Codex app and CLI",
   "author": {
     "name": "Chrome DevTools MCP maintainers"

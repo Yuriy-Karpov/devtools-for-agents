@@ -29,7 +29,7 @@ codex --version
 ## Codex app — macOS
 
 1. Клонируйте репозиторий.
-2. Дважды нажмите `chatgpt/install-codex-macos.command`.
+2. Дважды нажмите `codex/install-codex-macos.command`.
 3. На открывшейся странице Codex установите или включите Chrome DevTools.
 4. Создайте новую задачу Codex.
 
@@ -38,12 +38,12 @@ codex --version
 ## Codex app — Windows
 
 1. Клонируйте репозиторий.
-2. Дважды нажмите `chatgpt\install-codex-windows.cmd`.
+2. Дважды нажмите `codex\install-codex-windows.cmd`.
 3. На открывшейся странице Codex установите или включите Chrome DevTools.
 4. Создайте новую задачу Codex.
 
 Если Windows блокирует запуск загруженного файла, откройте Terminal в каталоге
-`chatgpt` и выполните:
+`codex` и выполните:
 
 ```bat
 node install.mjs --app
@@ -54,8 +54,8 @@ node install.mjs --app
 Из корня репозитория:
 
 ```bash
-chmod +x chatgpt/install-codex-linux.sh
-./chatgpt/install-codex-linux.sh
+chmod +x codex/install-codex-linux.sh
+./codex/install-codex-linux.sh
 ```
 
 Установщик:
@@ -76,13 +76,13 @@ codex
 Универсальная команда для CLI на любой поддерживаемой платформе:
 
 ```bash
-node chatgpt/install.mjs --cli
+node codex/install.mjs --cli
 ```
 
 Безопасно проверить действия без изменения конфигурации:
 
 ```bash
-node chatgpt/install.mjs --cli --dry-run
+node codex/install.mjs --cli --dry-run
 ```
 
 ## Ручная установка MCP-зависимостей
@@ -90,7 +90,7 @@ node chatgpt/install.mjs --cli --dry-run
 Если зависимости нужно установить отдельно от установщика Codex:
 
 ```bash
-cd chatgpt
+cd codex
 npm run install:mcp
 ```
 
@@ -116,26 +116,26 @@ npm ci --omit=dev --no-audit --no-fund \
 Автоматический поиск браузера:
 
 ```bash
-node chatgpt/configure-browser.mjs --auto
+node codex/configure-browser.mjs --auto
 ```
 
 Интерактивный выбор:
 
 ```bash
-node chatgpt/configure-browser.mjs
+node codex/configure-browser.mjs
 ```
 
 Явный путь:
 
 ```bash
-node chatgpt/configure-browser.mjs "/usr/bin/chromium"
+node codex/configure-browser.mjs "/usr/bin/chromium"
 ```
 
 На macOS можно дважды нажать `select-browser-macos.command`, на Windows —
 `select-browser-windows.cmd`. Текущую настройку показывает:
 
 ```bash
-node chatgpt/configure-browser.mjs --show
+node codex/configure-browser.mjs --show
 ```
 
 Настройка хранится в:
@@ -154,31 +154,31 @@ node chatgpt/configure-browser.mjs --show
 macOS:
 
 ```text
-Дважды нажмите chatgpt/uninstall-codex-macos.command
+Дважды нажмите codex/uninstall-codex-macos.command
 ```
 
 Windows:
 
 ```text
-Дважды нажмите chatgpt\uninstall-codex-windows.cmd
+Дважды нажмите codex\uninstall-codex-windows.cmd
 ```
 
 Linux:
 
 ```bash
-./chatgpt/uninstall-codex-linux.sh
+./codex/uninstall-codex-linux.sh
 ```
 
 Универсальная команда:
 
 ```bash
-node chatgpt/uninstall.mjs
+node codex/uninstall.mjs
 ```
 
 Или через npm:
 
 ```bash
-cd chatgpt
+cd codex
 npm run uninstall:codex
 ```
 
@@ -188,13 +188,13 @@ npm run uninstall:codex
 
 ```bash
 # Показать действия без удаления
-node chatgpt/uninstall.mjs --dry-run
+node codex/uninstall.mjs --dry-run
 
 # Сохранить регистрацию marketplace
-node chatgpt/uninstall.mjs --keep-marketplace
+node codex/uninstall.mjs --keep-marketplace
 
 # Сохранить установленные npm-зависимости
-node chatgpt/uninstall.mjs --keep-deps
+node codex/uninstall.mjs --keep-deps
 ```
 
 Перед удалением скрипт проверяет, что одноимённые plugin и marketplace относятся

@@ -63,7 +63,7 @@ MCP-сервер `devtools`. MCP выполняет операции в брау
 
 | Каталог | Агент | Инструкция |
 | --- | --- | --- |
-| `chatgpt/` | Codex app и Codex CLI | [Установка для Codex](chatgpt/README.md) |
+| `codex/` | Codex app и Codex CLI | [Установка для Codex](codex/README.md) |
 | `gigacode/` | GigaCode | [Установка для GigaCode](gigacode/README.md) |
 | `qwencode/` | Qwen Code | [Установка для Qwen Code](qwencode/README.md) |
 | `opencode/` | OpenCode | [Установка для OpenCode](opencode/README.md) |
