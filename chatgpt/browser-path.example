@@ -1,0 +1,8 @@
+# macOS (.app bundle is supported)
+/Applications/Google Chrome.app
+
+# Windows (pass the .exe file)
+C:\Program Files\Google\Chrome\Application\chrome.exe
+
+# Linux
+/usr/bin/google-chrome-stable

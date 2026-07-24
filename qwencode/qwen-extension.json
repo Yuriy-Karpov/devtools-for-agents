@@ -1,0 +1,22 @@
+{
+  "name": "chrome-devtools",
+  "version": "1.0.0",
+  "skills": "skills",
+  "mcpServers": {
+    "devtools": {
+      "command": "node",
+      "args": [
+        "${extensionPath}${/}mcp${/}chrome-devtools-mcp-runtime${/}run-chrome-devtools-mcp.mjs",
+        "--no-usage-statistics",
+        "--no-performance-crux"
+      ],
+      "env": {
+        "CHROME_DEVTOOLS_MCP_NO_UPDATE_CHECKS": "1",
+        "CHROME_DEVTOOLS_MCP_NO_USAGE_STATISTICS": "1"
+      },
+      "discoveryTimeoutMs": 30000,
+      "timeout": 600000
+    }
+  }
+}
+

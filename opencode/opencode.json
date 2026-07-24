@@ -1,0 +1,27 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "devtools": {
+      "type": "local",
+      "command": [
+        "node",
+        "./mcp/chrome-devtools-mcp-runtime/run-chrome-devtools-mcp.mjs",
+        "--no-usage-statistics",
+        "--no-performance-crux"
+      ],
+      "enabled": true,
+      "environment": {
+        "CHROME_DEVTOOLS_MCP_NO_UPDATE_CHECKS": "1",
+        "CHROME_DEVTOOLS_MCP_NO_USAGE_STATISTICS": "1"
+      },
+      "timeout": 30000
+    }
+  },
+  "permission": {
+    "skill": {
+      "devtools": "allow"
+    },
+    "devtools_*": "allow"
+  }
+}
+

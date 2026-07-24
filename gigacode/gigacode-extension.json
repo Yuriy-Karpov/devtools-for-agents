@@ -1,0 +1,23 @@
+{
+  "name": "sberbro-devtools",
+  "version": "1.0.2",
+  "skills": "skills",
+  "mcpServers": {
+    "devtools": {
+      "command": "node",
+      "args": [
+        "${extensionPath}${/}mcp${/}sberbro-devtools-mcp${/}run-sberbro-devtools-mcp.mjs",
+        "--no-usage-statistics",
+        "--no-performance-crux"
+      ],
+      "env": {
+        "CHROME_DEVTOOLS_BROWSER_PATH_MAC": "/Applications/Google Chrome.app",
+        "CHROME_DEVTOOLS_BROWSER_PATH_LINUX": "/usr/bin/sberbrowser-browser",
+        "CHROME_DEVTOOLS_MCP_NO_UPDATE_CHECKS": "1",
+        "CHROME_DEVTOOLS_MCP_NO_USAGE_STATISTICS": "1"
+      },
+      "discoveryTimeoutMs": 30000,
+      "timeout": 600000
+    }
+  }
+}

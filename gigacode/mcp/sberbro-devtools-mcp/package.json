@@ -1,0 +1,10 @@
+{
+  "name": "offline-chrome-devtools-mcp",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Pinned offline runtime for Chrome DevTools MCP",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "chrome-devtools-mcp": "1.4.0"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "name": "codex-chrome-devtools-distribution",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Cross-platform Codex installer for the pinned Chrome DevTools plugin",
+  "type": "module",
+  "engines": {
+    "node": "^20.19.0 || ^22.12.0 || >=23"
+  },
+  "scripts": {
+    "install:mcp": "npm ci --omit=dev --no-audit --no-fund --prefix plugins/chrome-devtools/mcp/chrome-devtools-mcp-runtime",
+    "uninstall:codex": "node uninstall.mjs",
+    "test": "node --test tests/install.test.mjs"
+  }
+}

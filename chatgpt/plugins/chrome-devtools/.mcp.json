@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "devtools": {
+      "command": "node",
+      "args": [
+        "${PLUGIN_ROOT}/mcp/chrome-devtools-mcp-runtime/run-chrome-devtools-mcp.mjs",
+        "--no-usage-statistics",
+        "--no-performance-crux"
+      ],
+      "env": {
+        "CHROME_DEVTOOLS_MCP_NO_UPDATE_CHECKS": "1",
+        "CHROME_DEVTOOLS_MCP_NO_USAGE_STATISTICS": "1"
+      }
+    }
+  }
+}
