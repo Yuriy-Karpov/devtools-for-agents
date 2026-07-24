@@ -98,7 +98,7 @@ MCP-сервер `devtools`. MCP выполняет операции в брау
 
 - совместимый AI-агент из списка выше;
 - Node.js версии, указанной в инструкции выбранного дистрибутива;
-- Chrome, Chromium, Microsoft Edge, Yandex Browser, SberBrowser или другой
+- Chrome, Chromium, Microsoft Edge, Yandex Browser или другой
   совместимый Chromium-браузер.
 
 Если стандартный Chrome не используется, путь к браузеру можно указать через
