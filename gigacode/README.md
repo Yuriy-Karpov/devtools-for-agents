@@ -85,7 +85,7 @@ Launcher автоматически выбирает значение для т�
 Сначала клонируйте Git-репозиторий, затем установите каталог `gigacode/`:
 
 ```bash
-git clone <git-url> devtools-for-agents
+git clone https://github.com/Yuriy-Karpov/devtools-for-agents.git
 gigacode extensions install /полный/путь/devtools-for-agents/gigacode
 ```
 

@@ -15,7 +15,7 @@ Offline-набор подключает OpenCode к Chrome или другому
 Клонируйте репозиторий, перейдите в каталог `opencode/` и выполните:
 
 ```bash
-git clone <git-url> devtools-for-agents
+git clone https://github.com/Yuriy-Karpov/devtools-for-agents.git
 cd devtools-for-agents/opencode
 node install.mjs
 ```

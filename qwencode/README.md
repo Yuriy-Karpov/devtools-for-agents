@@ -15,7 +15,7 @@ Offline-расширение подключает Qwen Code к Chrome или д�
 Клонируйте репозиторий и установите расширение из каталога `qwencode/`:
 
 ```bash
-git clone <git-url> devtools-for-agents
+git clone https://github.com/Yuriy-Karpov/devtools-for-agents.git
 qwen extensions install /полный/путь/devtools-for-agents/qwencode
 ```
 
