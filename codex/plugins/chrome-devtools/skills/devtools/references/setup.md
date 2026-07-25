@@ -22,3 +22,9 @@ Explicit `--browser-url`, `--wsEndpoint`, and `--autoConnect` connection options
 take precedence over the browser path. If tools are missing, confirm that the
 plugin is enabled in Codex, start a new task, and run `npm run install:mcp` from
 the marketplace directory if `node_modules` is missing.
+
+Starting with the pinned 1.6.0 runtime, file-writing tools are restricted to the
+OS temporary directory when the MCP client does not negotiate filesystem roots.
+Prefer negotiated roots or temporary output. `--allowUnrestrictedPaths` disables
+that protection and should be used only with a trusted local client that cannot
+advertise roots, never as a default workaround.

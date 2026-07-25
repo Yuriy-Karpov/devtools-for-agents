@@ -1,4 +1,4 @@
 interface:
   display_name: "devtools-memory"
   short_description: "Investigate JavaScript heap usage and leaks"
-  default_prompt: "Use $devtools-memory to investigate this page memory usage."
+  default_prompt: "Use $devtools-memory to investigate repeatable browser heap growth and identify the retaining owner."

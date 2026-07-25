@@ -5,6 +5,6 @@
   "description": "Pinned offline runtime for Chrome DevTools MCP",
   "license": "UNLICENSED",
   "dependencies": {
-    "chrome-devtools-mcp": "1.4.0"
+    "chrome-devtools-mcp": "1.6.0"
   }
 }
