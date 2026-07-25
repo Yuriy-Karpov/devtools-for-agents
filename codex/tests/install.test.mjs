@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { execFileSync, spawnSync } from "node:child_process";
-import { chmod, mkdtemp, readFile, writeFile } from "node:fs/promises";
+import { access, chmod, mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -130,10 +130,12 @@ test("uninstaller removes only the matching plugin and marketplace", async () =>
     },
   ];
   const { stub, log } = await createCodexStub();
+  const codexHome = await mkdtemp(path.join(tmpdir(), "codex-home-"));
   execFileSync(process.execPath, [uninstaller, "--keep-deps"], {
     env: {
       ...process.env,
       CODEX_BIN: stub,
+      CODEX_HOME: codexHome,
       CODEX_TEST_LOG: log,
       CODEX_TEST_MARKETPLACES: JSON.stringify(marketplaces),
       CODEX_TEST_PLUGINS: JSON.stringify(plugins),
@@ -152,11 +154,13 @@ test("uninstaller refuses a same-name marketplace from another root", async () =
     { name: "chrome-devtools-local", root: path.join(tmpdir(), "other") },
   ];
   const { stub, log } = await createCodexStub();
+  const codexHome = await mkdtemp(path.join(tmpdir(), "codex-home-"));
   const result = spawnSync(process.execPath, [uninstaller, "--keep-deps"], {
     encoding: "utf8",
     env: {
       ...process.env,
       CODEX_BIN: stub,
+      CODEX_HOME: codexHome,
       CODEX_TEST_LOG: log,
       CODEX_TEST_MARKETPLACES: JSON.stringify(marketplaces),
       CODEX_TEST_PLUGINS: "[]",
@@ -171,10 +175,12 @@ test("uninstaller refuses a same-name marketplace from another root", async () =
 
 test("uninstaller is idempotent when plugin and marketplace are absent", async () => {
   const { stub, log } = await createCodexStub();
+  const codexHome = await mkdtemp(path.join(tmpdir(), "codex-home-"));
   execFileSync(process.execPath, [uninstaller, "--keep-deps"], {
     env: {
       ...process.env,
       CODEX_BIN: stub,
+      CODEX_HOME: codexHome,
       CODEX_TEST_LOG: log,
       CODEX_TEST_MARKETPLACES: "[]",
       CODEX_TEST_PLUGINS: "[]",
@@ -184,4 +190,38 @@ test("uninstaller is idempotent when plugin and marketplace are absent", async (
     ["plugin", "marketplace", "list", "--json"],
     ["plugin", "list", "--json"],
   ]);
+});
+
+test("uninstaller cleans stale cache when plugin is no longer listed", async () => {
+  const { stub, log } = await createCodexStub();
+  const codexHome = await mkdtemp(path.join(tmpdir(), "codex-home-"));
+  const staleCache = path.join(
+    codexHome,
+    "plugins",
+    "cache",
+    "chrome-devtools-local",
+    "chrome-devtools",
+    "old-version",
+  );
+  await writeFile(path.join(codexHome, ".keep"), "", "utf8");
+  await mkdir(staleCache, { recursive: true });
+  await writeFile(path.join(staleCache, "stale.txt"), "stale", "utf8");
+
+  execFileSync(process.execPath, [uninstaller, "--keep-deps"], {
+    env: {
+      ...process.env,
+      CODEX_BIN: stub,
+      CODEX_HOME: codexHome,
+      CODEX_TEST_LOG: log,
+      CODEX_TEST_MARKETPLACES: "[]",
+      CODEX_TEST_PLUGINS: "[]",
+    },
+  });
+
+  assert.deepEqual(await recordedCalls(log), [
+    ["plugin", "marketplace", "list", "--json"],
+    ["plugin", "list", "--json"],
+    ["plugin", "remove", "chrome-devtools@chrome-devtools-local"],
+  ]);
+  await assert.rejects(access(path.dirname(staleCache)));
 });

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { spawnSync } from "node:child_process";
-import { access, readFile, rm } from "node:fs/promises";
+import { access, readFile, readdir, rm, rmdir } from "node:fs/promises";
 import { constants, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { homedir } from "node:os";
@@ -33,6 +33,7 @@ const args = new Set(process.argv.slice(2));
 const dryRun = args.has("--dry-run");
 const keepMarketplace = args.has("--keep-marketplace");
 const keepDependencies = args.has("--keep-deps");
+const codexHome = process.env.CODEX_HOME || path.join(homedir(), ".codex");
 
 function resolveCodexCommand() {
   if (process.env.CODEX_BIN) return process.env.CODEX_BIN;
@@ -98,7 +99,7 @@ function run(commandArgs, options = {}) {
       `Could not run "${codex}". Install Codex CLI or set CODEX_BIN to its executable path.\n${result.error.message}`,
     );
   }
-  if (result.status !== 0) {
+  if (result.status !== 0 && !options.allowFailure) {
     const details = [result.stdout, result.stderr].filter(Boolean).join("\n").trim();
     throw new Error(
       `${codex} ${commandArgs.join(" ")} failed with exit code ${result.status}${details ? `:\n${details}` : ""}`,
@@ -141,6 +142,49 @@ async function removeDependencies() {
   }
 }
 
+async function pathExists(target) {
+  try {
+    await access(target, constants.F_OK);
+    return true;
+  } catch (error) {
+    if (error.code === "ENOENT") return false;
+    throw error;
+  }
+}
+
+async function removePluginCache(marketplaceName, pluginName) {
+  const marketplaceCache = path.join(
+    codexHome,
+    "plugins",
+    "cache",
+    marketplaceName,
+  );
+  const pluginCache = path.join(
+    marketplaceCache,
+    pluginName,
+  );
+  if (!(await pathExists(pluginCache))) {
+    console.log("Codex plugin cache is already absent.");
+  } else if (dryRun) {
+    console.log(`[dry-run] Remove ${pluginCache}`);
+  } else {
+    await rm(pluginCache, { recursive: true, force: true });
+    console.log("Removed stale Codex plugin cache.");
+  }
+
+  if (await pathExists(marketplaceCache)) {
+    const remainingEntries = await readdir(marketplaceCache);
+    if (remainingEntries.length === 0) {
+      if (dryRun) {
+        console.log(`[dry-run] Remove empty ${marketplaceCache}`);
+      } else {
+        await rmdir(marketplaceCache);
+        console.log("Removed empty marketplace cache directory.");
+      }
+    }
+  }
+}
+
 try {
   const marketplace = JSON.parse(await readFile(marketplaceFile, "utf8"));
   const manifest = JSON.parse(await readFile(pluginManifest, "utf8"));
@@ -170,6 +214,14 @@ try {
   const installedPlugin = pluginList.installed?.find(
     (plugin) => plugin.pluginId === selector,
   );
+  const pluginCache = path.join(
+    codexHome,
+    "plugins",
+    "cache",
+    marketplace.name,
+    manifest.name,
+  );
+  const hasPluginCache = await pathExists(pluginCache);
   if (installedPlugin) {
     const installedMarketplaceRoot =
       installedPlugin.marketplaceSource?.source;
@@ -184,6 +236,21 @@ try {
     }
     run(["plugin", "remove", selector]);
     console.log(`Removed ${selector} from Codex.`);
+  } else if (hasPluginCache) {
+    const removeResult = run(["plugin", "remove", selector], {
+      allowFailure: true,
+    });
+    if (removeResult.status === 0) {
+      console.log(
+        dryRun
+          ? `[dry-run] Would remove stale ${selector} configuration from Codex.`
+          : `Removed stale ${selector} configuration from Codex.`,
+      );
+    } else {
+      console.log(
+        `${selector} is not registered, continuing with stale cache cleanup.`,
+      );
+    }
   } else {
     console.log(`${selector} is not installed.`);
   }
@@ -197,6 +264,7 @@ try {
     console.log(`Marketplace "${marketplace.name}" is not registered.`);
   }
 
+  await removePluginCache(marketplace.name, manifest.name);
   await removeDependencies();
   console.log(
     dryRun

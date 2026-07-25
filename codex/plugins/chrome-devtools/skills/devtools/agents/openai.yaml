@@ -1,4 +1,5 @@
 interface:
-  display_name: "Chrome DevTools"
-  short_description: "Debug Chromium pages from Codex"
-  default_prompt: "Use $devtools to inspect this page in Chrome."
+  display_name: "DevTools"
+  short_description: "Debug live Chromium pages from Codex"
+  default_prompt: "Use $devtools to inspect this page in http://localhost:3000"
+

@@ -1,0 +1,4 @@
+interface:
+  display_name: "devtools-seo"
+  short_description: "Audit rendered pages for technical SEO issues"
+  default_prompt: "Use $devtools-seo to audit this page technical SEO."

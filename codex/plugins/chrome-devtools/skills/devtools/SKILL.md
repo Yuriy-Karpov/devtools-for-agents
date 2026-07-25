@@ -3,7 +3,7 @@ name: devtools
 description: Use a bundled local Chrome DevTools MCP to inspect and control live Chrome, Yandex Browser, Chromium, or another Chromium browser. Trigger for frontend reproduction, DOM and accessibility inspection, console or network errors, screenshots, browser automation, Lighthouse, performance traces, and verification of UI fixes.
 ---
 
-# Chrome DevTools MCP
+# DevTools
 
 Use the `devtools` MCP tools only when the task depends on live browser state.
 Do not launch a browser for static code analysis.

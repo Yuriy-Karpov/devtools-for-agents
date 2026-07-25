@@ -1,0 +1,4 @@
+interface:
+  display_name: "devtools-performance"
+  short_description: "Diagnose page-load and runtime performance"
+  default_prompt: "Use $devtools-performance to diagnose YOUR_PAGE_URL"

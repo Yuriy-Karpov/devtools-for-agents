@@ -1,16 +1,16 @@
 {
   "name": "chrome-devtools",
-  "version": "1.0.0+codex.20260724211525",
+  "version": "1.0.0+codex.20260725120312",
   "description": "Pinned Chrome DevTools MCP for Codex app and CLI",
   "author": {
-    "name": "Chrome DevTools MCP maintainers"
+    "name": "Yuriy Karpov"
   },
   "skills": "./skills/",
   "interface": {
-    "displayName": "Chrome DevTools",
+    "displayName": "DevTools",
     "shortDescription": "Debug live Chromium pages from Codex.",
     "longDescription": "Connect Codex on macOS, Windows, or Linux to a pinned Chrome DevTools MCP runtime for DOM, console, network, screenshots, browser automation, and performance analysis.",
-    "developerName": "Chrome DevTools MCP maintainers",
+    "developerName": "Yuriy Karpov",
     "category": "Developer Tools",
     "capabilities": [
       "Browser automation",

@@ -118,8 +118,9 @@ explicitly.
    insight sets from different runs.
 7. Connect each important metric to an evidence chain: resource timing,
    main-thread work, rendering, layout, third-party activity, or a specific input.
-   Use Network, Console, snapshot, screenshot, and emulation only as supporting
-   evidence.
+   When LCP is material to the request or verdict, follow the LCP causal diagnosis
+   below. Use Network, Console, snapshot, screenshot, `evaluate_script`, and
+   emulation only as supporting evidence.
 8. Check trace comparability. Do not remove outliers without explanation. Compare
    cold with cold and warm with warm; between baseline and `Slow 4G`, change only
    `networkConditions` and keep viewport, CPU throttling, auth, and scenario the
@@ -131,6 +132,55 @@ explicitly.
    equivalent trace required to verify each recommendation.
 11. After all runs, confirm that tracing is stopped, network throttling is
     disabled, and the recorded `restore CPU` action was completed.
+
+## LCP causal diagnosis
+
+Use this flow when LCP is slow, is the main optimization target, or reveals a
+material risk under the tested constraints. Do not run every check mechanically
+when LCP is clearly unrelated to the request.
+
+1. From the trace summary, record the LCP value and the returned insight names.
+   Analyze `LCPBreakdown` when available, then inspect only relevant supporting
+   insights such as `DocumentLatency`, `LCPDiscovery`, and `RenderBlocking`.
+2. Identify the LCP element and whether it is image-, text-, or video-based.
+   Prefer element and resource details already returned by the trace insight.
+   If they are missing, use a fresh snapshot or a read-only `evaluate_script`
+   query against buffered `largest-contentful-paint` entries. Treat missing
+   element details as a limitation; do not guess from the visually largest item.
+3. For a resource-backed LCP, locate the exact URL in `list_network_requests` and
+   inspect it with `get_network_request`. Establish when the request started,
+   what initiated it, its priority when available, redirects, transfer duration,
+   caching, and whether it was discoverable from the initial document. Do not
+   infer transfer size or priority when the tool did not return them.
+4. Inspect the rendered markup only for hypotheses supported by the trace:
+   `loading="lazy"` on the actual LCP image, CSS background discovery, JS-created
+   or hydration-delayed markup, absent or ineffective preload, missing
+   `fetchpriority`, render-blocking styles/scripts, font blocking for text LCP, or
+   hidden content that becomes visible late. A large viewport image is only an
+   LCP candidate; do not recommend `fetchpriority="high"` until the actual LCP
+   resource or a measured discovery problem is established.
+5. Attribute the bottleneck to the dominant LCP subpart and choose advice from
+   that branch:
+   - **TTFB** — investigate document redirects, server response, and document
+     delivery or caching. Do not propose image compression as the primary fix.
+   - **Resource load delay** — make the actual LCP resource discoverable earlier.
+     Prefer initial HTML with `<img>` or `<picture>`; remove lazy loading from the
+     LCP element; use `fetchpriority="high"` for the confirmed LCP image. Use an
+     exact image preload when early HTML discovery is impractical, especially for
+     CSS backgrounds, and ensure it matches the requested resource.
+   - **Resource load duration** — investigate bytes, responsive sizing, encoding,
+     request redirects, origin/CDN latency, and cache behavior. Recommend WebP,
+     AVIF, `srcset`, CDN, or caching only when the evidence supports that lever.
+   - **Element render delay** — investigate render-blocking CSS or fonts,
+     synchronous script, long main-thread tasks, client rendering/hydration, and
+     visibility changes. Do not assume a smaller image will reduce this delay.
+6. Preserve the complete timing breakdown in evidence. Percent shares help locate
+   leverage but are not performance budgets; a high share of a small total may
+   not justify work, while a smaller share of a poor total may still matter.
+7. Verify with an equivalent trace under the same route, viewport, auth, cache,
+   CPU, and network profile. Compare the affected subpart and total LCP, and check
+   that CLS and other material metrics did not regress. Use comparable repeated
+   runs for quantitative before/after claims.
 
 ## Interpretation rules
 
@@ -153,6 +203,11 @@ explicitly.
   CrUX, respecting its URL/origin granularity.
 - Do not invent a product performance budget. If none was provided, label common
   thresholds as guidance rather than acceptance criteria.
+- The common LCP bands (good at or below 2.5 s, needs improvement above 2.5 s and
+  at or below 4.0 s, poor above 4.0 s) describe Core Web Vitals field guidance.
+  A lab trace can use them for orientation but cannot establish that a URL or
+  origin passes the field metric. Field assessment requires suitable field data
+  and its URL/origin granularity.
 - Do not assign severity from a metric value alone. Consider whether the issue
   blocks or materially degrades the scoped user flow.
 
@@ -163,34 +218,71 @@ requested language takes precedence. If the language is unclear, mixed, or a
 fallback is required, respond in Russian. Do not translate MCP tool names,
 parameters, insight IDs, enum values, or other technical identifiers.
 
-Return a compact report with:
+Write for a reader who first needs to know whether the measured experience is
+fast, what is actually wrong, and what to do next. Lead with the outcome; put
+measurement protocol and trace identifiers near the end. Do not make the reader
+infer the verdict from raw metrics.
 
-1. **Scope** — URL, scenario, viewport/device, cache protocol, run count, initial
-   application state, baseline and `Slow 4G`, `series CPU`, `CPU source`,
-   `restore CPU`, auth, trace type, assumptions, and cleanup status.
-2. **Summary** — the main performance outcome without false precision; for
-   comparable repeats, report baseline and `Slow 4G` medians and spread separately.
-3. **Runs** — for each trace, `run index`, pair or `n/a`, network and CPU profiles,
-   cache, validity, key metrics, and insight set ID.
-4. **Findings** — ordered by `critical`, `high`, `medium`, `low`, or `info`.
-5. **Evidence** — metric, trace insight, request, task, layout event, or exact
-   reproduction step.
-6. **Recommendations** — a concrete change direction and equivalent re-test.
-7. **Limitations** — missing field data, instability, too few valid runs,
-   inaccessible states, unknown pre-audit CPU state, exhausted retry budget,
-   failed cleanup, or checks not performed.
+Use this order:
 
-For every finding state the observation, user impact, evidence, confidence
-(`high`, `medium`, or `low`), recommendation, and verification method. Use
-`critical` only when the problem blocks a key flow or makes it effectively
-unusable.
+1. **Verdict** — one or two plain-language sentences. State whether the measured
+   scenario is healthy, needs attention, or has a serious problem, and name the
+   most important reason. Scope the verdict to the tested scenario. If no
+   material problem was found, say so explicitly. Do not call a result "good" or
+   "bad" from a common threshold alone; make clear when thresholds are guidance
+   rather than a product budget.
+2. **At a glance** — a short list or small table of the user-relevant metrics and
+   their meaning. Separate `What is good` from `What needs attention`. Do not list
+   a technically interesting observation as a problem when it had no measured
+   user impact. When LCP is a material finding, name the LCP element or resource
+   and show the four subparts when available; otherwise do not add an LCP
+   breakdown just for completeness.
+3. **What to do** — ordered, concrete actions. Label each as `now`, `next`, or
+   `optional` according to measured user impact and expected leverage. If no
+   action is urgent, say that before listing optional improvements.
+4. **Issues** — only material findings, ordered by severity. Keep each finding
+   scannable with short labeled bullets: `Problem`, `User impact`, `Evidence`,
+   `Action`, and `Verify`. State severity and confidence separately in words;
+   avoid ambiguous headings such as `[medium][high]`.
+5. **Test details** — URL, scenario, viewport/device, auth, cache protocol, trace
+   type, run count, baseline and `Slow 4G`, `series CPU`, `CPU source`,
+   `restore CPU`, assumptions, and cleanup status. Include a compact runs table
+   with run index, pair or `n/a`, network and CPU profiles, cache, validity, key
+   metrics, and insight set ID. Keep exact trace identifiers here unless they are
+   direct evidence for a finding.
+6. **Limitations** — only limitations that affect interpretation or coverage:
+   missing field data, too few valid runs, inaccessible states, instability,
+   unknown pre-audit CPU state, exhausted retry budget, failed cleanup, or checks
+   not performed.
 
-Compact finding template:
+Omit empty sections. Put non-actionable details such as expected console noise or
+a non-blocking request chain under a brief `Additional notes` section rather than
+mixing them with prioritized issues.
+
+Use `critical` only when the problem blocks a key flow or makes it effectively
+unusable. For every material finding include the observation, user impact,
+evidence, confidence (`high`, `medium`, or `low`), recommendation, and equivalent
+verification trace. Tie an LCP recommendation to the measured dominant subpart
+and confirmed element/resource instead of listing generic image optimizations.
+
+Preferred finding shape:
 
 ```md
-### [severity][confidence] Finding title
-Observation → Impact → Evidence → Recommendation → Verification
+### Finding title
+
+Severity: medium. Confidence: high.
+
+- **Problem:** ...
+- **User impact:** ...
+- **Evidence:** ...
+- **Action:** ...
+- **Verify:** ...
 ```
+
+Prefer a concise report over repeating the same fact in the verdict, metrics,
+finding, and recommendation. For comparable repeats, report baseline and
+`Slow 4G` medians and spread separately. Label a single run or pair as
+diagnostic, not regression-grade.
 
 ## Stop and degrade safely
 

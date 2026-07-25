@@ -1,0 +1,4 @@
+interface:
+  display_name: "devtools-accessibility"
+  short_description: "Audit accessibility in live Chromium pages"
+  default_prompt: "Use $devtools-accessibility to audit this page accessibility."
